@@ -1,0 +1,37 @@
+service: service-template
+org: nicklloyd
+package:
+  individually: true
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    SERVICE: ${self:service}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Use http keep-alive for AWS connections
+functions:
+  hello:
+    handler: src/handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-webpack
+  - serverless-prune-plugin
+  - serverless-offline
+custom:
+  prune:
+    automatic: true
+    number: 5 # Number of versions to keep
+  serverless-offline:
+    allowCache: true
+    httpsProtocol: ./local-certs
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
