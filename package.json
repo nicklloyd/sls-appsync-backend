@@ -1,8 +1,7 @@
 {
-  "name": "sls-typescript-template",
+  "name": "sls-appsync-backend",
   "version": "1.0.0",
-  "description": "Serverless webpack example using Typescript",
-  "main": "handler.js",
+  "description": "Serverless Typescript using AppSync & Direct Lambda",
   "scripts": {
     "build": "sls webpack",
     "deploy:env": "sls deploy --stage $NODE_ENV",
@@ -39,6 +38,7 @@
     "jest": "^26.4.2",
     "npm-check": "^5.9.2",
     "prettier": "^2.1.1",
+    "serverless-appsync-plugin": "^1.4.0",
     "serverless-dotenv-plugin": "^3.0.0",
     "serverless-offline": "^6.7.0",
     "serverless-prune-plugin": "^1.4.3",
@@ -50,6 +50,6 @@
     "webpack-cli": "^3.3.12",
     "webpack-node-externals": "^2.5.2"
   },
-  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "author": "Nick Lloyd",
   "license": "MIT"
 }

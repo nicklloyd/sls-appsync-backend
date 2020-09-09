@@ -11,8 +11,14 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "@typescript-eslint/explicit-function-return-type": [
+      "error",
+      {
+        "allowTypedFunctionExpressions": true
+      }
+    ],
     "no-extra-semi": "off",
-    "no-console": "warn",
+    "no-console": "off",
     "no-unused-vars": [
       "error",
       {
