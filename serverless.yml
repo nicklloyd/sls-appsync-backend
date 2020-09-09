@@ -10,15 +10,14 @@ provider:
   environment:
     service: sls-appsync-backend
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Use http keep-alive for AWS connections
-functions:
-  graphql:
-    handler: src/handler.graphql
+
 plugins:
   - serverless-dotenv-plugin
   - serverless-appsync-plugin
   - serverless-webpack
   - serverless-prune-plugin
   - serverless-offline
+
 custom:
   prune:
     automatic: true
@@ -36,138 +35,12 @@ custom:
       awsRegion: ${env:REGION}
       defaultAction: ALLOW
       userPoolId: { Ref: CognitoUserPool }
-    schema: # defaults schema.graphql
     serviceRole: 'AppSyncServiceRole'
-    dataSources:
-      - type: AWS_LAMBDA
-        name: awsLambdaDataSource
-        description: 'Lambda DataSource'
-        config:
-          lambdaFunctionArn: { Fn::GetAtt: [GraphqlLambdaFunction, Arn] }
-          serviceRoleArn: { Fn::GetAtt: [AppSyncLambdaServiceRole, Arn] }
+    dataSources: ${file(resources/data-sources.yml)}
+
+functions:
+  - ${file(resources/functions.yml)}
 
 resources:
-  Resources:
-    # Cognito - User pool
-    CognitoUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: cognito_sls_appsync_user_pool
-    # Cognito - Client
-    CognitoUserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        ClientName: cognito_sls_appsync_client
-        UserPoolId:
-          Ref: CognitoUserPool
-    # Cognito - Identity
-    CognitoIdentityPool:
-      Type: AWS::Cognito::IdentityPool
-      Properties:
-        IdentityPoolName: cognito_sls_appsync_identity_pool
-        AllowUnauthenticatedIdentities: false
-        CognitoIdentityProviders:
-          - ClientId:
-              Ref: CognitoUserPoolClient
-            ProviderName:
-              Fn::GetAtt: [CognitoUserPool, ProviderName]
-    # Cognito roles
-    CognitoIdentityPoolRoles:
-      Type: AWS::Cognito::IdentityPoolRoleAttachment
-      Properties:
-        IdentityPoolId:
-          Ref: CognitoIdentityPool
-        Roles:
-          authenticated:
-            Fn::GetAtt: [CognitoAuthRole, Arn]
-          unauthenticated:
-            Fn::GetAtt: [CognitoUnauthRole, Arn]
-    CognitoAuthRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: cognito_sls_appsync_appAuthRole
-        Path: /
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: 'Allow'
-              Principal:
-                Federated: 'cognito-identity.amazonaws.com'
-              Action:
-                - 'sts:AssumeRoleWithWebIdentity'
-              Condition:
-                StringEquals:
-                  'cognito-identity.amazonaws.com:aud':
-                    Ref: CognitoIdentityPool
-                'ForAnyValue:StringLike':
-                  'cognito-identity.amazonaws.com:amr': authenticated
-        Policies:
-          - PolicyName: 'CognitoAuthorizedPolicy'
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: 'Allow'
-                  Action:
-                    - 'mobileanalytics:PutEvents'
-                    - 'cognito-sync:*'
-                    - 'cognito-identity:*'
-                  Resource: '*'
-                - Effect: 'Allow'
-                  Action:
-                    - 'execute-api:Invoke'
-                  Resource: '*'
-    CognitoUnauthRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: cognito_sls_appsync_appUnauthRole
-        Path: /
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: 'Allow'
-              Principal:
-                Federated: 'cognito-identity.amazonaws.com'
-              Action:
-                - 'sts:AssumeRoleWithWebIdentity'
-              Condition:
-                StringEquals:
-                  'cognito-identity.amazonaws.com:aud':
-                    Ref: CognitoIdentityPool
-                'ForAnyValue:StringLike':
-                  'cognito-identity.amazonaws.com:amr': unauthenticated
-        Policies:
-          - PolicyName: 'CognitoUnauthorizedPolicy'
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: 'Allow'
-                  Action:
-                    - 'mobileanalytics:PutEvents'
-                    - 'cognito-sync:*'
-                    - 'cognito-identity:*'
-                  Resource: '*'
-    # AppSync lambda role
-    AppSyncLambdaServiceRole:
-      Type: 'AWS::IAM::Role'
-      Properties:
-        RoleName: 'Lambda-${self:custom.appSync.serviceRole}'
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: 'Allow'
-              Principal:
-                Service:
-                  - 'appsync.amazonaws.com'
-              Action:
-                - 'sts:AssumeRole'
-        Policies:
-          - PolicyName: 'Lambda-${self:custom.appSync.serviceRole}-Policy'
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: 'Allow'
-                  Action:
-                    - 'lambda:invokeFunction'
-                  Resource:
-                    - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:AWS_STAGE}-graphql'
-                    - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:AWS_STAGE}-graphql:*'
+  # Roles
+  - ${file(resources/roles.yml)}

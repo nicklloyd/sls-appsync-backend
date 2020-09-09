@@ -1,0 +1,6 @@
+- type: AWS_LAMBDA
+  name: awsLambdaDataSource
+  description: 'Lambda DataSource'
+  config:
+    lambdaFunctionArn: { Fn::GetAtt: [GraphqlLambdaFunction, Arn] }
+    serviceRoleArn: { Fn::GetAtt: [AppSyncLambdaServiceRole, Arn] }
