@@ -1,0 +1,16 @@
+{
+  "version" : "2017-02-28",
+  "operation" : "PutItem",
+  "key" : {
+      "id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+  },
+
+  #set( $user = $util.dynamodb.toMapValues($ctx.args) )
+  #set( $user.email = $util.dynamodb.toString($ctx.identity.claims.email))
+  #set( $user.createdAt = $util.dynamodb.toString($util.time.nowISO8601()))
+
+  "attributeValues" : $util.toJson($user),
+  "condition": {
+    "expression": "attribute_not_exists(email)"
+  }
+}

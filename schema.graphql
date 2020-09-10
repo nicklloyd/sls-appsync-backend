@@ -7,11 +7,13 @@ type Query {
   listTodos(limit: Int, nextToken: String): TodoConnection
   getTodo(id: ID!): Todo
   getLamda: LamdaField!
+  listUsers(limit: Int, nextToken: String): UserConnection
 }
 
 type Mutation {
   addTodo(name: String, description: String, priority: Int, status: TodoStatus): Todo
   addComment(todoId: ID!, content: String): Comment
+  addUser(src: String!): User
 }
 
 type LamdaField {
@@ -41,4 +43,16 @@ type TodoConnection {
 enum TodoStatus {
   done
   pending
+}
+
+type User {
+  id: ID!
+  email: String!
+  src: String
+  createdAt: String
+}
+
+type UserConnection {
+  users: [User]
+  nextToken: String
 }

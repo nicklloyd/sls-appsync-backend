@@ -10,6 +10,18 @@
   request: 'getTodo-request.vtl'
   response: 'getTodo-response.vtl'
 
+- dataSource: UsersTableDS
+  type: Mutation
+  field: addUser
+  request: 'addUser-request.vtl'
+  response: 'addUser-response.vtl'
+
+- dataSource: UsersTableDS
+  type: Query
+  field: listUsers
+  request: 'listUsers-request.vtl'
+  response: 'listUsers-response.vtl'
+
 - dataSource: awsLambdaDS
   type: Query
   field: getLamda
