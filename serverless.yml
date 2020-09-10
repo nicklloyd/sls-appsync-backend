@@ -6,7 +6,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ${env:REGION}
-  stage: ${opt:stage, env:AWS_STAGE, 'dev'}
+  stage: ${opt:stage, env:STAGE, 'dev'}
   environment:
     service: sls-appsync-backend
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Use http keep-alive for AWS connections
@@ -37,10 +37,14 @@ custom:
       userPoolId: { Ref: CognitoUserPool }
     serviceRole: 'AppSyncServiceRole'
     dataSources: ${file(resources/data-sources.yml)}
+    defaultMappingTemplates:
+      request: false
+      response: false
+    mappingTemplates: ${file(resources/mapping.yml)}
 
 functions:
   - ${file(resources/functions.yml)}
 
 resources:
-  # Roles
   - ${file(resources/roles.yml)}
+  - ${file(resources/tables.yml)}

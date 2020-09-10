@@ -1,19 +1,30 @@
-export const graphql = async (
-  event: unknown,
-  context: unknown,
-  info: unknown
-): Promise<unknown> => {
+type AWSInfo = {
+  fieldName: string
+}
+
+type AWSAppSyncEvent = {
+  identity: AWSCognitoIdentity
+  info: AWSInfo
+}
+
+type AWSCognitoIdentity = {
+  claims: AWSCognitoClaims
+}
+
+type AWSCognitoClaims = {
+  email: string
+}
+
+export const graphql = async (event: AWSAppSyncEvent): Promise<unknown> => {
   console.log(event)
-  console.log(context)
-  console.log(info)
+  const {
+    identity: {
+      claims: { email }
+    },
+    info: { fieldName }
+  } = event
 
-  let response
-  try {
-    response = 'hello world from appsync'
-  } catch (err) {
-    console.log(err)
-    return err
+  return {
+    message: `User: ${email} Resolved via Lambda by calling: ${fieldName}`
   }
-
-  return response
 }

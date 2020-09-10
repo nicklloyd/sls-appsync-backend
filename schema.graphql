@@ -1,7 +1,44 @@
-type Query {
-  helloWorld: String!
-}
-
 schema {
   query: Query
+  mutation: Mutation
+}
+
+type Query {
+  listTodos(limit: Int, nextToken: String): TodoConnection
+  getTodo(id: ID!): Todo
+  getLamda: LamdaField!
+}
+
+type Mutation {
+  addTodo(name: String, description: String, priority: Int, status: TodoStatus): Todo
+  addComment(todoId: ID!, content: String): Comment
+}
+
+type LamdaField {
+  message: String!
+}
+
+type Comment {
+  todoId: ID!
+  commentId: String!
+  content: String
+}
+
+type Todo {
+  id: ID!
+  name: String
+  description: String
+  priority: Int
+  status: TodoStatus
+  comments: [Comment]
+}
+
+type TodoConnection {
+  todos: [Todo]
+  nextToken: String
+}
+
+enum TodoStatus {
+  done
+  pending
 }

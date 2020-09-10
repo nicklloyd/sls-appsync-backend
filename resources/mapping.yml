@@ -1,0 +1,15 @@
+- dataSource: TodosTableDS
+  type: Query
+  field: listTodos
+  request: 'listTodos-request.vtl'
+  response: 'listTodos-response.vtl'
+
+- dataSource: TodosTableDS
+  type: Query
+  field: getTodo
+  request: 'getTodo-request.vtl'
+  response: 'getTodo-response.vtl'
+
+- dataSource: awsLambdaDS
+  type: Query
+  field: getLamda

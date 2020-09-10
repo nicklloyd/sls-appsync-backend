@@ -1,6 +1,18 @@
 - type: AWS_LAMBDA
-  name: awsLambdaDataSource
+  name: awsLambdaDS
   description: 'Lambda DataSource'
   config:
     lambdaFunctionArn: { Fn::GetAtt: [GraphqlLambdaFunction, Arn] }
     serviceRoleArn: { Fn::GetAtt: [AppSyncLambdaServiceRole, Arn] }
+
+- type: AMAZON_DYNAMODB
+  name: TodosTableDS
+  config:
+    tableName: { Ref: TodosTable }
+    serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
+
+- type: AMAZON_DYNAMODB
+  name: UsersTableDS
+  config:
+    tableName: { Ref: UsersTable }
+    serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }

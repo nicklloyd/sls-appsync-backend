@@ -109,6 +109,7 @@ Resources:
             Principal:
               Service:
                 - 'appsync.amazonaws.com'
+                - 'lambda.amazonaws.com'
             Action:
               - 'sts:AssumeRole'
       Policies:
@@ -120,5 +121,36 @@ Resources:
                 Action:
                   - 'lambda:invokeFunction'
                 Resource:
-                  - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:AWS_STAGE}-graphql'
-                  - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:AWS_STAGE}-graphql:*'
+                  - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:STAGE}-graphql'
+                  - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:STAGE}-graphql:*'
+
+  AppSyncDynamoDBServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'appsync.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'appsync-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:Scan'
+                Resource:
+                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:TODOS_TABLE}-${env:STAGE}'
+                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:TODOS_TABLE}-${env:STAGE}/*'
+                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:USERS_TABLE}-${env:STAGE}'
+                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:USERS_TABLE}-${env:STAGE}/*'
