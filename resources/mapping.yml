@@ -25,3 +25,7 @@
 - dataSource: awsLambdaDS
   type: Query
   field: getLamda
+
+- dataSource: awsLambdaDS
+  type: Mutation
+  field: addTodo

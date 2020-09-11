@@ -3,16 +3,16 @@
   description: 'Lambda DataSource'
   config:
     lambdaFunctionArn: { Fn::GetAtt: [GraphqlLambdaFunction, Arn] }
-    serviceRoleArn: { Fn::GetAtt: [AppSyncLambdaServiceRole, Arn] }
+    serviceRoleArn: { Fn::GetAtt: [AppSyncServiceRole, Arn] }
 
 - type: AMAZON_DYNAMODB
   name: TodosTableDS
   config:
     tableName: { Ref: TodosTable }
-    serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
+    serviceRoleArn: { Fn::GetAtt: [AppSyncServiceRole, Arn] }
 
 - type: AMAZON_DYNAMODB
   name: UsersTableDS
   config:
     tableName: { Ref: UsersTable }
-    serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
+    serviceRoleArn: { Fn::GetAtt: [AppSyncServiceRole, Arn] }

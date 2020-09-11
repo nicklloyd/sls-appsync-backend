@@ -7,6 +7,8 @@ provider:
   runtime: nodejs12.x
   region: ${env:REGION}
   stage: ${opt:stage, env:STAGE, 'dev'}
+  profile: default
+  role: { Fn::GetAtt: [AppSyncServiceRole, Arn] }
   environment:
     service: sls-appsync-backend
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Use http keep-alive for AWS connections

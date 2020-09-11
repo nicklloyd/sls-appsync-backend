@@ -36,7 +36,7 @@ Resources:
   CognitoAuthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: cognito_sls_appsync_appAuthRole
+      RoleName: '${self:custom.appSync.serviceRole}-Cognito-AuthRole'
       Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -70,7 +70,7 @@ Resources:
   CognitoUnauthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: cognito_sls_appsync_appUnauthRole
+      RoleName: '${self:custom.appSync.serviceRole}-Cognito-UnauthRole'
       Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -97,11 +97,11 @@ Resources:
                   - 'cognito-sync:*'
                   - 'cognito-identity:*'
                 Resource: '*'
-  # AppSync lambda role
-  AppSyncLambdaServiceRole:
+
+  AppSyncServiceRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: 'Lambda-${self:custom.appSync.serviceRole}'
+      RoleName: '${self:custom.appSync.serviceRole}'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -113,7 +113,7 @@ Resources:
             Action:
               - 'sts:AssumeRole'
       Policies:
-        - PolicyName: 'Lambda-${self:custom.appSync.serviceRole}-Policy'
+        - PolicyName: 'appsync-lambda-graphql-policy-${env:STAGE}'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -124,23 +124,6 @@ Resources:
                   - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:STAGE}-graphql'
                   - 'arn:aws:lambda:${env:REGION}:${env:AWS_ACCOUNT_ID}:function:${self:service}-${env:STAGE}-graphql:*'
 
-  AppSyncDynamoDBServiceRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service:
-                - 'appsync.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-      Policies:
-        - PolicyName: 'appsync-policy'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
               - Effect: 'Allow'
                 Action:
                   - 'dynamodb:PutItem'
@@ -150,7 +133,13 @@ Resources:
                   - 'dynamodb:Query'
                   - 'dynamodb:Scan'
                 Resource:
-                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:TODOS_TABLE}-${env:STAGE}'
-                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:TODOS_TABLE}-${env:STAGE}/*'
-                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:USERS_TABLE}-${env:STAGE}'
-                  - 'arn:aws:dynamodb:${env:REGION}:${env:AWS_ACCOUNT_ID}:table/${env:USERS_TABLE}-${env:STAGE}/*'
+                  - { 'Fn::GetAtt': ['TodosTable', 'Arn'] }
+                  - { 'Fn::GetAtt': ['UsersTable', 'Arn'] }
+
+              - Effect: 'Allow'
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - 'arn:aws:logs:*:*:*'

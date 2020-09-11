@@ -2,7 +2,7 @@ Resources:
   TodosTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: ${env:TODOS_TABLE}-${env:STAGE}
+      TableName: ${env:TODOS_TABLE}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
@@ -13,7 +13,7 @@ Resources:
   UsersTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: ${env:USERS_TABLE}-${env:STAGE}
+      TableName: ${env:USERS_TABLE}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id

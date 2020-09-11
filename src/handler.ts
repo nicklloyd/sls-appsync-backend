@@ -1,10 +1,14 @@
+import { APIGatewayEvent } from 'aws-lambda'
+import { addTodo } from './resolvers/addTodo'
+
 type AWSInfo = {
   fieldName: string
 }
 
-type AWSAppSyncEvent = {
+interface AWSAppSyncEvent extends APIGatewayEvent {
   identity: AWSCognitoIdentity
   info: AWSInfo
+  arguments: any
 }
 
 type AWSCognitoIdentity = {
@@ -16,7 +20,6 @@ type AWSCognitoClaims = {
 }
 
 export const graphql = async (event: AWSAppSyncEvent): Promise<unknown> => {
-  console.log(event)
   const {
     identity: {
       claims: { email }
@@ -24,7 +27,13 @@ export const graphql = async (event: AWSAppSyncEvent): Promise<unknown> => {
     info: { fieldName }
   } = event
 
+  switch (fieldName) {
+    case 'addTodo':
+      const todo = await addTodo(event.arguments)
+      return todo
+  }
+
   return {
-    message: `User: ${email} Resolved via Lambda by calling: ${fieldName}`
+    message: `User: ${email} called Lambda, but there is no resolver for ${fieldName} yet.`
   }
 }
